@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -8,6 +6,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import { createClient } from "@/lib/supabase/client";
+import { canEditDocument } from "@/lib/supabase/document-permissions";
 import {
   Bold,
   Italic,
@@ -48,7 +47,7 @@ export default function DocumentEditor({ id }: Props) {
   const canEditRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const canEdit = permission === "owner" || permission === "editor";
+  const canEdit = canEditDocument(permission);
   const canShare = permission === "owner";
 
   const editor = useEditor({
@@ -147,8 +146,7 @@ export default function DocumentEditor({ id }: Props) {
           share.permission === "editor" ? "editor" : "viewer";
       }
 
-      canEditRef.current =
-        userPermission === "owner" || userPermission === "editor";
+      canEditRef.current = canEditDocument(userPermission);
 
       setPermission(userPermission);
       setTitle(data.title);
@@ -685,3 +683,4 @@ function ToolbarButton({
     </button>
   );
 }
+
